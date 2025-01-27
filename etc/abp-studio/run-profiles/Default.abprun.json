@@ -1,0 +1,13 @@
+﻿{
+  "applications": {
+    "SistemaRamais.Web": {
+      "type": "dotnet-project",
+      "launchUrl": "https://localhost:44321",
+      "path": "../../../src/SistemaRamais.Web/SistemaRamais.Web.csproj",
+      "kubernetesService": ".*-web$",
+      "execution": {
+        "order": 2
+      }
+    }
+  }
+}
