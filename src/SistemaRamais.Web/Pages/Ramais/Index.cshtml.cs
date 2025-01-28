@@ -14,11 +14,10 @@ namespace SistemaRamais.Web.Pages.Ramais
 {
     public abstract class IndexModelBase : AbpPageModel
     {
+        public string? NomeFilter { get; set; }
         public string? NumeroFilter { get; set; }
         public string? DepartamentoFilter { get; set; }
-        public string? ResponsavelFilter { get; set; }
         public string? EmailFilter { get; set; }
-        public string? TelefoneFilter { get; set; }
 
         protected IRamaisAppService _ramaisAppService;
 

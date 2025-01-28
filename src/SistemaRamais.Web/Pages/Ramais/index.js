@@ -18,14 +18,14 @@ $(function () {
 
 	var getFilter = function() {
         return {
-            filterText: $("#FilterText").val(),
+            filterText: removeDiacritics($("#FilterText").val()).toLowerCase(),
+            nome: removeDiacritics($("#NomeFilter").val()).toLowerCase(),
             numero: $("#NumeroFilter").val(),
-			departamento: $("#DepartamentoFilter").val(),
-			responsavel: $("#ResponsavelFilter").val(),
-			email: $("#EmailFilter").val(),
-			telefone: $("#TelefoneFilter").val()
+            departamento: $("#DepartamentoFilter").val(),
+            email: $("#EmailFilter").val(),
         };
     };
+    
     
     //<suite-custom-code-block-1>
     //</suite-custom-code-block-1>
@@ -62,11 +62,11 @@ $(function () {
                 },
                 width: "1rem"
             },
+            { data: "nome" },
 			{ data: "numero" },
 			{ data: "departamento" },
-			{ data: "responsavel" },
 			{ data: "email" },
-			{ data: "telefone" }        
+		      
     ];
     
     
@@ -264,10 +264,19 @@ $(function () {
 
 	$("#SearchForm").submit(function (e) {
         e.preventDefault();
+
+        var filterText = $("#FilterText").val();
+        $("#FilterText").val(removeDiacritics(filterText).toLowerCase());
+
         dataTable.ajax.reloadEx();;
         selectOrUnselectAllCheckboxes(false);
         showOrHideContextMenu();
     });
+
+    function removeDiacritics(text) {
+        if (!text) return text;
+        return text.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove os acentos
+    }
 
     $("#ExportToExcelButton").click(function (e) {
         e.preventDefault();
@@ -279,11 +288,10 @@ $(function () {
                         abp.utils.buildQueryString([
                             { name: 'downloadToken', value: result.token },
                             { name: 'filterText', value: input.filterText }, 
+                            { name: 'nome', value: input.nome }, 
                             { name: 'numero', value: input.numero }, 
                             { name: 'departamento', value: input.departamento }, 
-                            { name: 'responsavel', value: input.responsavel }, 
                             { name: 'email', value: input.email }, 
-                            { name: 'telefone', value: input.telefone }
                             ]);
                             
                     var downloadWindow = window.open(url, '_blank');

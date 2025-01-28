@@ -8,6 +8,7 @@ using SistemaRamais.Shared;
 
 namespace SistemaRamais.Ramais
 {
+
     public partial interface IRamaisAppService : IApplicationService
     {
 
@@ -24,7 +25,6 @@ namespace SistemaRamais.Ramais
         Task<IRemoteStreamContent> GetListAsExcelFileAsync(RamalExcelDownloadDto input);
         Task DeleteByIdsAsync(List<Guid> ramalIds);
 
-        Task DeleteAllAsync(GetRamaisInput input);
         Task<SistemaRamais.Shared.DownloadTokenResultDto> GetDownloadTokenAsync();
 
     }

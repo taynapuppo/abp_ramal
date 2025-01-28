@@ -3,84 +3,73 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text;
-using System.Globalization;
 using Microsoft.EntityFrameworkCore;
+using Volo.Abp.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 
 namespace SistemaRamais.Ramais
 {
-    public class RamalSearchService
+    public class RamalSearchService : IRamalSearchService
     {
         private readonly IRamalRepository _ramalRepository;
+        private readonly ILookupNormalizer _lookupNormalizer;
 
-        // Construtor com dependência do repositório de ramais
-        public RamalSearchService(IRamalRepository ramalRepository)
+        // Construtor para inicialização de dependências
+        public RamalSearchService(IRamalRepository ramalRepository, ILookupNormalizer lookupNormalizer)
         {
             _ramalRepository = ramalRepository;
+            _lookupNormalizer = lookupNormalizer;
         }
 
-        // Função para normalizar os nomes, removendo acentos
-        private static string RemoverAcentos(string texto)
+        public virtual async Task<List<(string Ramal, string Nome, int Score)>> BuscarNomeAsync(string query)
         {
-            var normalizedString = texto.Normalize(NormalizationForm.FormD);
-            var sb = new StringBuilder();
+            // Normaliza a consulta para maiúsculas, já que você está usando NormalizedName
+            var normalizedQuery = _lookupNormalizer.NormalizeName(query).ToUpper();
+            var cleanQuery = RemoveDiacritics(normalizedQuery);
 
-            foreach (var c in normalizedString)
-            {
-                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+            // Obtém todos os ramais do repositório
+            var ramais = await _ramalRepository.GetListAsync();
+
+            // Filtra os ramais para aqueles cujo NormalizedName contenha a consulta
+            var resultados = ramais
+                .Where(r => RemoveDiacritics(r.NormalizedName).Contains(cleanQuery)) // Filtro baseado no nome normalizado
+                .Select(r => new
                 {
-                    sb.Append(c);
-                }
-            }
-
-            return sb.ToString().Normalize(NormalizationForm.FormC);
-        }
-
-        // Função para calcular a distância de Levenshtein
-        private static int LevenshteinDistance(string a, string b)
-        {
-            var n = a.Length;
-            var m = b.Length;
-            var d = new int[n + 1, m + 1];
-
-            for (var i = 0; i <= n; d[i, 0] = i++) ;
-            for (var j = 0; j <= m; d[0, j] = j++) ;
-
-            for (var i = 1; i <= n; i++)
-            {
-                for (var j = 1; j <= m; j++)
-                {
-                    var cost = a[i - 1] == b[j - 1] ? 0 : 1;
-                    d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + cost);
-                }
-            }
-
-            return d[n, m];
-        }
-
-        // Método de busca usando Levenshtein e FuzzySharp
-        public async Task<List<(string Ramal, string Responsavel, int Score)>> BuscarResponsavelAsync(string query)
-        {
-            // Remover acentos da query
-            var querySemAcentos = RemoverAcentos(query);
-
-            // Obtenha todos os ramais com uma busca insensível a maiúsculas/minúsculas e remova acentos com 'unaccent'
-            var ramais = await _ramalRepository.GetListAsync(r => EF.Functions.ILike(
-                EF.Functions.Unaccent(RemoverAcentos(r.Responsavel)), $"%{querySemAcentos}%"));
-
-            return ramais
-                .Select(d =>
-                {
-                    // Separa o nome completo em partes (considerando o último como sobrenome)
-                    var partesNome = d.Responsavel.Split(' ');
-                    var sobrenome = partesNome.Last();  // Considera o último nome como sobrenome
-
-                    // Faz a comparação com o sobrenome
-                    return (d.Numero, d.Responsavel, Score: Fuzz.PartialRatio(querySemAcentos, RemoverAcentos(sobrenome)));
+                    r.Numero,
+                    r.Nome,
+                    Score = FuzzyMatchScore(r.NormalizedName, cleanQuery)  // Calcula o score fuzzy
                 })
-                .Where(d => d.Score > 60) // Ajuste conforme necessário para permitir maior ou menor flexibilidade
-                .OrderByDescending(d => d.Score)
                 .ToList();
+
+            // Retorna os resultados com o nome e o score
+            return resultados.Select(r => (r.Numero, r.Nome, r.Score)).ToList();
         }
+
+        // Função para calcular o score de similaridade entre o nome normalizado e a query
+        private int FuzzyMatchScore(string normalizedName, string query)
+        {
+            return FuzzySharp.Fuzz.Ratio(normalizedName, query);  
+        }
+
+        private static string RemoveDiacritics(string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            var normalizedString = text.Normalize(System.Text.NormalizationForm.FormD);
+            var stringBuilder = new System.Text.StringBuilder();
+
+            foreach (var chr in normalizedString)
+            {
+                var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(chr);
+                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
+                    stringBuilder.Append(chr);
+            }
+
+            return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        }
+
     }
 }

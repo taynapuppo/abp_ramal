@@ -102,11 +102,10 @@ public class SistemaRamaisDbContext :
             {
                 b.ToTable(SistemaRamaisConsts.DbTablePrefix + "Ramais", SistemaRamaisConsts.DbSchema);
                 b.ConfigureByConvention();
+                b.Property(x => x.Nome).HasColumnName(nameof(Ramal.Nome)).IsRequired().HasMaxLength(RamalConsts.NomeMaxLength);
                 b.Property(x => x.Numero).HasColumnName(nameof(Ramal.Numero)).IsRequired().HasMaxLength(RamalConsts.NumeroMaxLength);
                 b.Property(x => x.Departamento).HasColumnName(nameof(Ramal.Departamento)).IsRequired().HasMaxLength(RamalConsts.DepartamentoMaxLength);
-                b.Property(x => x.Responsavel).HasColumnName(nameof(Ramal.Responsavel)).IsRequired().HasMaxLength(RamalConsts.ResponsavelMaxLength);
                 b.Property(x => x.Email).HasColumnName(nameof(Ramal.Email)).IsRequired().HasMaxLength(RamalConsts.EmailMaxLength);
-                b.Property(x => x.Telefone).HasColumnName(nameof(Ramal.Telefone)).IsRequired().HasMaxLength(RamalConsts.TelefoneMaxLength);
             });
 
         }

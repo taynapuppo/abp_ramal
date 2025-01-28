@@ -13,6 +13,7 @@ using Volo.Abp.TextTemplateManagement;
 using Volo.Saas.Host;
 using Microsoft.Extensions.DependencyInjection;
 using SistemaRamais.Ramais;
+using Microsoft.AspNetCore.Identity;
 
 namespace SistemaRamais;
 
@@ -31,17 +32,21 @@ namespace SistemaRamais;
     typeof(LanguageManagementApplicationModule),
     typeof(AbpGdprApplicationModule),
     typeof(AbpSettingManagementApplicationModule)
-    )]
+)]
 public class SistemaRamaisApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddTransient<RamalSearchService>();
+        context.Services.AddScoped<RamalSearchService>();
+
+        context.Services.AddTransient<ILookupNormalizer, UpperInvariantLookupNormalizer>();
+        
+        context.Services.AddTransient<RamalManager>();
+
 
         Configure<AbpAutoMapperOptions>(options =>
         {
             options.AddMaps<SistemaRamaisApplicationModule>();
         });
-
     }
 }

@@ -11,19 +11,17 @@ namespace SistemaRamais.Ramais
 
         Task DeleteAllAsync(
             string? filterText = null,
+            string? nome = null,
             string? numero = null,
             string? departamento = null,
-            string? responsavel = null,
             string? email = null,
-            string? telefone = null,
             CancellationToken cancellationToken = default);
         Task<List<Ramal>> GetListAsync(
                     string? filterText = null,
+                    string? nome = null,
                     string? numero = null,
                     string? departamento = null,
-                    string? responsavel = null,
                     string? email = null,
-                    string? telefone = null,
                     string? sorting = null,
                     int maxResultCount = int.MaxValue,
                     int skipCount = 0,
@@ -32,11 +30,10 @@ namespace SistemaRamais.Ramais
 
         Task<long> GetCountAsync(
             string? filterText = null,
+            string? nome = null,
             string? numero = null,
             string? departamento = null,
-            string? responsavel = null,
             string? email = null,
-            string? telefone = null,
             CancellationToken cancellationToken = default);
     }
 }

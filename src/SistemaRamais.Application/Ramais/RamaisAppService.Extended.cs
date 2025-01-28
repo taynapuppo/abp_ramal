@@ -17,6 +17,9 @@ using Volo.Abp.Authorization;
 using Volo.Abp.Caching;
 using Microsoft.Extensions.Caching.Distributed;
 using SistemaRamais.Shared;
+using Volo.Abp.Identity;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace SistemaRamais.Ramais
 {
@@ -26,9 +29,10 @@ namespace SistemaRamais.Ramais
             IRamalRepository ramalRepository,
             RamalManager ramalManager,
             IDistributedCache<RamalDownloadTokenCacheItem, string> downloadTokenCache,
-            RamalSearchService ramalSearchService 
+            RamalSearchService ramalSearchService,
+            ILookupNormalizer lookupNormalizer
         )
-            : base(ramalRepository, ramalManager, downloadTokenCache, ramalSearchService) 
+            : base(ramalRepository, ramalManager, downloadTokenCache, ramalSearchService, lookupNormalizer) 
         {
         }
     }

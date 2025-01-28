@@ -7,67 +7,71 @@ using Volo.Abp;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace SistemaRamais.Ramais
 {
     public abstract class RamalManagerBase : DomainService
     {
-        protected IRamalRepository _ramalRepository;
+        private readonly IRamalRepository _ramalRepository;
+        private readonly ILookupNormalizer _lookupNormalizer;
 
-        public RamalManagerBase(IRamalRepository ramalRepository)
+        public RamalManagerBase(IRamalRepository ramalRepository, ILookupNormalizer lookupNormalizer)
         {
             _ramalRepository = ramalRepository;
+            _lookupNormalizer = lookupNormalizer;
         }
 
         public virtual async Task<Ramal> CreateAsync(
-        string numero, string departamento, string responsavel, string email, string telefone)
+            string nome, string numero, string departamento, string email,
+            string normalizedName, string normalizedEmail)
         {
+            Check.NotNullOrWhiteSpace(nome, nameof(nome));
+            Check.Length(nome, nameof(nome), RamalConsts.NomeMaxLength, RamalConsts.NomeMinLength);
             Check.NotNullOrWhiteSpace(numero, nameof(numero));
             Check.Length(numero, nameof(numero), RamalConsts.NumeroMaxLength, RamalConsts.NumeroMinLength);
             Check.NotNullOrWhiteSpace(departamento, nameof(departamento));
             Check.Length(departamento, nameof(departamento), RamalConsts.DepartamentoMaxLength, RamalConsts.DepartamentoMinLength);
-            Check.NotNullOrWhiteSpace(responsavel, nameof(responsavel));
-            Check.Length(responsavel, nameof(responsavel), RamalConsts.ResponsavelMaxLength, RamalConsts.ResponsavelMinLength);
             Check.NotNullOrWhiteSpace(email, nameof(email));
             Check.Length(email, nameof(email), RamalConsts.EmailMaxLength, RamalConsts.EmailMinLength);
-            Check.NotNullOrWhiteSpace(telefone, nameof(telefone));
-            Check.Length(telefone, nameof(telefone), RamalConsts.TelefoneMaxLength, RamalConsts.TelefoneMinLength);
 
             var ramal = new Ramal(
                 GuidGenerator.Create(),
-                numero, departamento, responsavel, email, telefone
-             );
+                nome, numero, departamento, email,
+                normalizedName, normalizedEmail // Use os parâmetros aqui
+            );
 
             return await _ramalRepository.InsertAsync(ramal);
         }
 
+
         public virtual async Task<Ramal> UpdateAsync(
             Guid id,
-            string numero, string departamento, string responsavel, string email, string telefone, [CanBeNull] string? concurrencyStamp = null
+            string nome, string numero, string departamento, string email,
+            string normalizedName, string normalizedEmail,
+            [CanBeNull] string? concurrencyStamp = null
         )
         {
+            Check.NotNullOrWhiteSpace(nome, nameof(nome));
+            Check.Length(nome, nameof(nome), RamalConsts.NomeMaxLength, RamalConsts.NomeMinLength);
             Check.NotNullOrWhiteSpace(numero, nameof(numero));
             Check.Length(numero, nameof(numero), RamalConsts.NumeroMaxLength, RamalConsts.NumeroMinLength);
             Check.NotNullOrWhiteSpace(departamento, nameof(departamento));
             Check.Length(departamento, nameof(departamento), RamalConsts.DepartamentoMaxLength, RamalConsts.DepartamentoMinLength);
-            Check.NotNullOrWhiteSpace(responsavel, nameof(responsavel));
-            Check.Length(responsavel, nameof(responsavel), RamalConsts.ResponsavelMaxLength, RamalConsts.ResponsavelMinLength);
             Check.NotNullOrWhiteSpace(email, nameof(email));
             Check.Length(email, nameof(email), RamalConsts.EmailMaxLength, RamalConsts.EmailMinLength);
-            Check.NotNullOrWhiteSpace(telefone, nameof(telefone));
-            Check.Length(telefone, nameof(telefone), RamalConsts.TelefoneMaxLength, RamalConsts.TelefoneMinLength);
 
             var ramal = await _ramalRepository.GetAsync(id);
 
+            ramal.Nome = nome;
             ramal.Numero = numero;
             ramal.Departamento = departamento;
-            ramal.Responsavel = responsavel;
             ramal.Email = email;
-            ramal.Telefone = telefone;
+            ramal.NormalizedName = normalizedName;
+            ramal.NormalizedEmail = normalizedEmail;
 
             ramal.SetConcurrencyStampIfNotNull(concurrencyStamp);
             return await _ramalRepository.UpdateAsync(ramal);
         }
-
     }
 }
