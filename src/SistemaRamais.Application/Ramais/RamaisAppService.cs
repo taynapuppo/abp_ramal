@@ -51,7 +51,7 @@ namespace SistemaRamais.Ramais
         }
 
         [AllowAnonymous]
-        public virtual async Task<List<RamalDto>> GetNomeFuzzyFromDb(string query)
+        public virtual async Task<List<RamalDto>> GetNomeFuzzy(string query)
         {
             var normalizedQuery = NormalizeString(_lookupNormalizer.NormalizeName(query));
 
@@ -119,7 +119,7 @@ namespace SistemaRamais.Ramais
             if (!string.IsNullOrEmpty(input.FilterText))
             {
                 // Realiza a busca fuzzy
-                var ramais = await GetNomeFuzzyFromDb(input.FilterText);
+                var ramais = await GetNomeFuzzy(input.FilterText);
                 ramaisDto = ramais;
             }
             else
