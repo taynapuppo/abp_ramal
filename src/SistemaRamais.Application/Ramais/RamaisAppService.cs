@@ -18,6 +18,11 @@ using Volo.Abp.Identity;
 using Volo.Abp.Caching;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Identity;
+using System.Globalization;
+using System.Text;
+using FuzzySharp;
+
+
 
 
 namespace SistemaRamais.Ramais
@@ -28,41 +33,117 @@ namespace SistemaRamais.Ramais
         protected readonly IDistributedCache<RamalDownloadTokenCacheItem, string> _downloadTokenCache;
         protected readonly IRamalRepository _ramalRepository;
         protected readonly RamalManager _ramalManager;
-        protected readonly IRamalSearchService _ramalSearchService; 
         protected readonly ILookupNormalizer _lookupNormalizer;
+
 
         // Construtor com dependências
         public RamaisAppServiceBase(
             IRamalRepository ramalRepository,
             RamalManager ramalManager,
             IDistributedCache<RamalDownloadTokenCacheItem, string> downloadTokenCache,
-            IRamalSearchService ramalSearchService, 
             ILookupNormalizer lookupNormalizer
         )
         {
             _downloadTokenCache = downloadTokenCache;
             _ramalRepository = ramalRepository;
             _ramalManager = ramalManager;
-            _ramalSearchService = ramalSearchService; 
             _lookupNormalizer = lookupNormalizer;
         }
 
-        // Método de busca fuzzy - alterado para assíncrono
         [AllowAnonymous]
-        public virtual async Task<List<(string Ramal, string Nome, int Score)>> BuscarNomeFuzzy(string query)
+        public virtual async Task<List<RamalDto>> GetNomeFuzzyFromDb(string query)
         {
-            return await _ramalSearchService.BuscarNomeAsync(query);  // Chamando o serviço de busca usando a interface
+            var normalizedQuery = NormalizeString(_lookupNormalizer.NormalizeName(query));
+
+            // Busca todos os ramais do repositório
+            var ramais = await _ramalRepository.GetListAsync();
+
+            // Aplica a comparação fuzzy nos nomes e filtra por pontuação
+            var ramaisComFuzzy = ramais
+                .Select(ramal => new
+                {
+                    Ramal = ramal,
+                    Score = Fuzz.WeightedRatio(NormalizeString(ramal.Nome), normalizedQuery)
+                })
+                .Where(r => r.Score > 65)
+                .OrderByDescending(r => r.Score)
+                .Take(10)
+                .ToList();
+
+            // Mapeia os resultados para o DTO e retorna
+            return ObjectMapper.Map<List<Ramal>, List<RamalDto>>(ramaisComFuzzy.Select(r => r.Ramal).ToList());
         }
+
+
+        private int GetBestFuzzyScore(string fullName, string query)
+        {
+            var normalizedQuery = NormalizeString(query);
+            var words = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var scores = words.Select(word => Fuzz.WeightedRatio(NormalizeString(word), normalizedQuery)).ToList();
+
+            return scores.Any() ? scores.Max() : 0;
+        }
+
+
+        private static string NormalizeString(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            // Remove acentos e converte para minúsculas
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var chr in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(chr);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                    stringBuilder.Append(chr);
+            }
+
+            // Retorna a string normalizada e em minúsculas
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC).ToLowerInvariant();
+        }
+
 
         public virtual async Task<PagedResultDto<RamalDto>> GetListAsync(GetRamaisInput input)
         {
-            var totalCount = await _ramalRepository.GetCountAsync(input.FilterText, input.Nome, input.Numero, input.Departamento, input.Email);
-            var items = await _ramalRepository.GetListAsync(input.FilterText, input.Nome, input.Numero, input.Departamento, input.Email, input.Sorting, input.MaxResultCount, input.SkipCount);
+            // Normaliza a entrada antes da busca
+            var nomeNormalizado = string.IsNullOrEmpty(input.Nome) ? null : NormalizeString(_lookupNormalizer.NormalizeName(input.Nome));
 
+            // Buscando com o fuzzy direto no banco
+            List<RamalDto> ramaisDto = new List<RamalDto>();
+
+            if (!string.IsNullOrEmpty(input.FilterText))
+            {
+                // Realiza a busca fuzzy
+                var ramais = await GetNomeFuzzyFromDb(input.FilterText);
+                ramaisDto = ramais;
+            }
+            else
+            {
+                // Caso contrário, faz a busca tradicional no repositório
+                var ramais = await _ramalRepository.GetListAsync(
+                    filterText: input.FilterText?.ToLower(),
+                    nome: nomeNormalizado,
+                    numero: input.Numero,
+                    departamento: input.Departamento,
+                    email: input.Email,
+                    sorting: input.Sorting,
+                    maxResultCount: input.MaxResultCount,
+                    skipCount: input.SkipCount
+                );
+
+                ramaisDto = ObjectMapper.Map<List<Ramal>, List<RamalDto>>(ramais);
+            }
+
+            // Retorna os resultados com paginação
             return new PagedResultDto<RamalDto>
             {
-                TotalCount = totalCount,
-                Items = ObjectMapper.Map<List<Ramal>, List<RamalDto>>(items)
+                TotalCount = ramaisDto.Count,
+                Items = ramaisDto
             };
         }
 

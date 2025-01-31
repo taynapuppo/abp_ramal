@@ -37,7 +37,6 @@ public class SistemaRamaisApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddScoped<RamalSearchService>();
 
         context.Services.AddTransient<ILookupNormalizer, UpperInvariantLookupNormalizer>();
         
