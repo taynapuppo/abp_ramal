@@ -42,6 +42,8 @@ public class SistemaRamaisApplicationModule : AbpModule
         
         context.Services.AddTransient<RamalManager>();
 
+        context.Services.AddTransient<RamaisAppServiceBase, RamaisAppService>();
+
 
         Configure<AbpAutoMapperOptions>(options =>
         {

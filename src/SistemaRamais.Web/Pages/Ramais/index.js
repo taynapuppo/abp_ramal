@@ -18,8 +18,8 @@ $(function () {
 
 	var getFilter = function() {
         return {
-            filterText: removeDiacritics($("#FilterText").val()).toLowerCase(),
-            nome: removeDiacritics($("#NomeFilter").val()).toLowerCase(),
+            filterText: $("#FilterText").val(),
+            nome: $("#NomeFilter").val(),
             numero: $("#NumeroFilter").val(),
             departamento: $("#DepartamentoFilter").val(),
             email: $("#EmailFilter").val(),
@@ -265,18 +265,12 @@ $(function () {
 	$("#SearchForm").submit(function (e) {
         e.preventDefault();
 
-        var filterText = $("#FilterText").val();
-        $("#FilterText").val(removeDiacritics(filterText).toLowerCase());
 
         dataTable.ajax.reloadEx();;
         selectOrUnselectAllCheckboxes(false);
         showOrHideContextMenu();
     });
 
-    function removeDiacritics(text) {
-        if (!text) return text;
-        return text.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove os acentos
-    }
 
     $("#ExportToExcelButton").click(function (e) {
         e.preventDefault();

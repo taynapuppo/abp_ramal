@@ -29,9 +29,9 @@ namespace SistemaRamais.Ramais
             IRamalRepository ramalRepository,
             RamalManager ramalManager,
             IDistributedCache<RamalDownloadTokenCacheItem, string> downloadTokenCache,
-            ILookupNormalizer lookupNormalizer
+            ILookupNormalizer lookupNormalizer, IIdentityUserRepository userRepository
         )
-            : base(ramalRepository, ramalManager, downloadTokenCache, lookupNormalizer) 
+            : base(ramalRepository, ramalManager, downloadTokenCache, lookupNormalizer, userRepository) 
         {
         }
     }

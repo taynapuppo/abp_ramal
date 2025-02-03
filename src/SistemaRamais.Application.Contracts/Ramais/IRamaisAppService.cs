@@ -27,5 +27,8 @@ namespace SistemaRamais.Ramais
 
         Task<SistemaRamais.Shared.DownloadTokenResultDto> GetDownloadTokenAsync();
 
+        Task<int> GetTotalRamaisAsync();           
+        Task<int> GetTotalDepartamentosAsync();    
+        Task<int> GetTotalUsuariosAtivosAsync();
     }
 }

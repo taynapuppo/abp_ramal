@@ -56,6 +56,8 @@ public class SistemaRamaisDbContext :
     public DbSet<IdentityUserDelegation> UserDelegations { get; set; }
     public DbSet<IdentitySession> Sessions { get; set; }
 
+
+
     // SaaS
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<Edition> Editions { get; set; }

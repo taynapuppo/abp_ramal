@@ -63,9 +63,40 @@ public class SistemaRamaisMenuContributor : IMenuContributor
             ).RequirePermissions(SistemaRamaisPermissions.Dashboard.Tenant)
         );
 
+        context.Menu.AddItem(
+            new ApplicationMenuItem(
+                SistemaRamaisMenus.Ramais,
+                l["Menu:Ramais"],
+                url: "/Ramais",
+                icon: "fa fa-phone",
+                order: 3,
+                requiredPermissionName: SistemaRamaisPermissions.Ramais.Default)
+        );
+
+        context.Menu.AddItem(
+            new ApplicationMenuItem(
+                SistemaRamaisMenus.Relatorios,
+                l["Menu:Relatorios"], 
+                url: "/Relatorios",
+                icon: "fa fa-file-alt",
+                order: 4
+            )
+        );
+
+        // Aba de Gráficos
+        context.Menu.AddItem(
+            new ApplicationMenuItem(
+                SistemaRamaisMenus.Graficos,
+                l["Menu:Graficos"],
+                url: "/Graficos",
+                icon: "fa fa-chart-bar",
+                order: 5
+            )
+        );
+
         //Administration
         var administration = context.Menu.GetAdministration();
-        administration.Order = 5;
+        administration.Order = 6;
 
         //Administration->Saas
         administration.SetSubItemOrder(SaasHostMenuNames.GroupName, 1);
@@ -88,14 +119,7 @@ public class SistemaRamaisMenuContributor : IMenuContributor
         //Administration->Settings
         administration.SetSubItemOrder(SettingManagementMenuNames.GroupName, 7);
 
-        context.Menu.AddItem(
-            new ApplicationMenuItem(
-                SistemaRamaisMenus.Ramais,
-                l["Menu:Ramais"],
-                url: "/Ramais",
-                icon: "fa fa-phone",
-                requiredPermissionName: SistemaRamaisPermissions.Ramais.Default)
-        );
+       
         return Task.CompletedTask;
     }
 }

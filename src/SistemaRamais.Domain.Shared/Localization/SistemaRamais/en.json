@@ -71,6 +71,11 @@
     "Email": "Email",
     "Telefone": "Telefone",
     "Menu:Ramais": "Ramais",
-    "Menu:SistemaRamais": "Sistema Ramais"
+    "Menu:SistemaRamais": "Sistema Ramais",
+    "Menu:Relatorios": "Relatórios",
+    "Menu:Graficos": "Gráficos",
+    "Relatorios": "Relatorios",
+    "Relatórios": "Relatórios",
+    "Graficos": "Graficos"
   }
 }

@@ -12,4 +12,7 @@ public class SistemaRamaisMenus
 
     public const string Ramais = Prefix + ".Ramais";
 
+    public const string Relatorios = Prefix + ".Relatorios"; 
+    public const string Graficos = Prefix + ".Graficos"; 
+
 }

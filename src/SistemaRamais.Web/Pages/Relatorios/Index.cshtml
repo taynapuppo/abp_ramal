@@ -1,0 +1,42 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using SistemaRamais.Permissions
+@using SistemaRamais.Web.Pages.Ramais
+@using SistemaRamais.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using SistemaRamais.Localization
+@using SistemaRamais.Application.Contracts;
+@model SistemaRamais.Web.Pages.Relatorios.IndexModel
+@inject IHtmlLocalizer<SistemaRamais.Localization.SistemaRamaisResource> L
+
+<abp-card>
+    <abp-card-header>
+        <h2>@L["Relatórios"]</h2>
+    </abp-card-header>
+    <abp-card-body>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Ramal</th>
+                    <th>Departamento</th>
+                    <th>Data de Criação</th>
+                    <th>Criado Por</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Ramais)
+                {
+                    <tr>
+                        <td>@item.Nome</td>
+                        <td>@item.Numero</td>
+                        <td>@item.Departamento</td>
+                        <td>@item.DataCriacao?.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@item.CriadoPor</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </abp-card-body>
+</abp-card>

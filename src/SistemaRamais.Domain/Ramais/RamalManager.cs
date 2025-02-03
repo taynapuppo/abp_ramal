@@ -38,7 +38,7 @@ namespace SistemaRamais.Ramais
             var ramal = new Ramal(
                 GuidGenerator.Create(),
                 nome, numero, departamento, email,
-                normalizedName, normalizedEmail // Use os parâmetros aqui
+                normalizedName, normalizedEmail 
             );
 
             return await _ramalRepository.InsertAsync(ramal);

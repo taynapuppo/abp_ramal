@@ -1,5 +1,6 @@
 ﻿using Volo.Abp.Localization;
 
+
 namespace SistemaRamais.Localization;
 
 [LocalizationResourceName("SistemaRamais")]

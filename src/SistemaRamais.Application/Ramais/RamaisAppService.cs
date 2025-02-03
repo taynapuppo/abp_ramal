@@ -20,9 +20,9 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Identity;
 using System.Globalization;
 using System.Text;
-using FuzzySharp;
-
-
+using Microsoft.AspNetCore.Mvc;
+using Volo.Abp.AspNetCore.Mvc;
+using SistemaRamais.Application.Contracts.Ramais;
 
 
 namespace SistemaRamais.Ramais
@@ -34,6 +34,8 @@ namespace SistemaRamais.Ramais
         protected readonly IRamalRepository _ramalRepository;
         protected readonly RamalManager _ramalManager;
         protected readonly ILookupNormalizer _lookupNormalizer;
+        protected readonly IIdentityUserRepository _userRepository;
+
 
 
         // Construtor com dependências
@@ -41,112 +43,29 @@ namespace SistemaRamais.Ramais
             IRamalRepository ramalRepository,
             RamalManager ramalManager,
             IDistributedCache<RamalDownloadTokenCacheItem, string> downloadTokenCache,
-            ILookupNormalizer lookupNormalizer
+            ILookupNormalizer lookupNormalizer, IIdentityUserRepository userRepository
         )
         {
             _downloadTokenCache = downloadTokenCache;
             _ramalRepository = ramalRepository;
             _ramalManager = ramalManager;
             _lookupNormalizer = lookupNormalizer;
+            _userRepository = userRepository;
+
         }
 
-        [AllowAnonymous]
-        public virtual async Task<List<RamalDto>> GetNomeFuzzy(string query)
+        
+         public virtual async Task<PagedResultDto<RamalDto>> GetListAsync(GetRamaisInput input)
         {
-            var normalizedQuery = NormalizeString(_lookupNormalizer.NormalizeName(query));
+            var totalCount = await _ramalRepository.GetCountAsync(_lookupNormalizer.NormalizeName(input.FilterText), _lookupNormalizer.NormalizeName(input.Nome), input.Numero, input.Departamento, _lookupNormalizer.NormalizeEmail(input.Email));
+            var items = await _ramalRepository.GetListAsync(_lookupNormalizer.NormalizeName(input.FilterText), _lookupNormalizer.NormalizeName(input.Nome), input.Numero, input.Departamento, _lookupNormalizer.NormalizeEmail(input.Email), input.Sorting, input.MaxResultCount, input.SkipCount);
 
-            // Busca todos os ramais do repositório
-            var ramais = await _ramalRepository.GetListAsync();
-
-            // Aplica a comparação fuzzy nos nomes e filtra por pontuação
-            var ramaisComFuzzy = ramais
-                .Select(ramal => new
-                {
-                    Ramal = ramal,
-                    Score = Fuzz.WeightedRatio(NormalizeString(ramal.Nome), normalizedQuery)
-                })
-                .Where(r => r.Score > 65)
-                .OrderByDescending(r => r.Score)
-                .Take(10)
-                .ToList();
-
-            // Mapeia os resultados para o DTO e retorna
-            return ObjectMapper.Map<List<Ramal>, List<RamalDto>>(ramaisComFuzzy.Select(r => r.Ramal).ToList());
-        }
-
-
-        private int GetBestFuzzyScore(string fullName, string query)
-        {
-            var normalizedQuery = NormalizeString(query);
-            var words = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var scores = words.Select(word => Fuzz.WeightedRatio(NormalizeString(word), normalizedQuery)).ToList();
-
-            return scores.Any() ? scores.Max() : 0;
-        }
-
-
-        private static string NormalizeString(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return string.Empty;
-            }
-
-            // Remove acentos e converte para minúsculas
-            var normalizedString = text.Normalize(NormalizationForm.FormD);
-            var stringBuilder = new StringBuilder();
-
-            foreach (var chr in normalizedString)
-            {
-                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(chr);
-                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
-                    stringBuilder.Append(chr);
-            }
-
-            // Retorna a string normalizada e em minúsculas
-            return stringBuilder.ToString().Normalize(NormalizationForm.FormC).ToLowerInvariant();
-        }
-
-
-        public virtual async Task<PagedResultDto<RamalDto>> GetListAsync(GetRamaisInput input)
-        {
-            // Normaliza a entrada antes da busca
-            var nomeNormalizado = string.IsNullOrEmpty(input.Nome) ? null : NormalizeString(_lookupNormalizer.NormalizeName(input.Nome));
-
-            // Buscando com o fuzzy direto no banco
-            List<RamalDto> ramaisDto = new List<RamalDto>();
-
-            if (!string.IsNullOrEmpty(input.FilterText))
-            {
-                // Realiza a busca fuzzy
-                var ramais = await GetNomeFuzzy(input.FilterText);
-                ramaisDto = ramais;
-            }
-            else
-            {
-                // Caso contrário, faz a busca tradicional no repositório
-                var ramais = await _ramalRepository.GetListAsync(
-                    filterText: input.FilterText?.ToLower(),
-                    nome: nomeNormalizado,
-                    numero: input.Numero,
-                    departamento: input.Departamento,
-                    email: input.Email,
-                    sorting: input.Sorting,
-                    maxResultCount: input.MaxResultCount,
-                    skipCount: input.SkipCount
-                );
-
-                ramaisDto = ObjectMapper.Map<List<Ramal>, List<RamalDto>>(ramais);
-            }
-
-            // Retorna os resultados com paginação
             return new PagedResultDto<RamalDto>
             {
-                TotalCount = ramaisDto.Count,
-                Items = ramaisDto
+                TotalCount = totalCount,
+                Items = ObjectMapper.Map<List<Ramal>, List<RamalDto>>(items)
             };
         }
-
         public virtual async Task<RamalDto> GetAsync(Guid id)
         {
             return ObjectMapper.Map<Ramal, RamalDto>(await _ramalRepository.GetAsync(id));
@@ -225,5 +144,76 @@ namespace SistemaRamais.Ramais
                 Token = token
             };
         }
+
+
+        public virtual async Task<IActionResult> GetEstatisticas()
+        {
+            // Obter as estatísticas diretamente
+            var totalRamais = await GetTotalRamaisAsync();
+            var totalDepartamentos = await GetTotalDepartamentosAsync();
+            var totalUsuariosAtivos = await GetTotalUsuariosAtivosAsync();
+
+            // Retornar as estatísticas
+            return new ObjectResult(new 
+            {
+                TotalRamais = totalRamais,
+                TotalDepartamentos = totalDepartamentos,
+                TotalUsuariosAtivos = totalUsuariosAtivos
+            });
+        }
+
+
+        public virtual async Task<int> GetTotalRamaisAsync()
+        {
+            // Contagem de ramais
+            return await _ramalRepository.CountAsync();
+        }
+
+        public virtual async Task<int> GetTotalDepartamentosAsync()
+        {
+            // Obter a lista de ramais do repositório
+            var ramais = await _ramalRepository.GetListAsync();
+
+            // Contagem de departamentos distintos
+            var departamentos = ramais
+                .Select(r => r.Departamento) // Obter os departamentos
+                .Distinct() // Filtrar departamentos únicos
+                .Count(); // Contagem local
+
+            return departamentos;
+        }
+
+        public virtual async Task<int> GetTotalUsuariosAtivosAsync()
+        {
+            // Obter a lista de ramais do repositório
+            var ramais = await _ramalRepository.GetListAsync();
+
+            
+            var usuariosAtivos = ramais
+                .Where(r => !string.IsNullOrEmpty(r.Nome)) 
+                .Count(); // Contagem local
+
+            return usuariosAtivos;
+        }
+
+        public async Task<List<RamalRelatorioDto>> GetRelatorioAsync()
+        {
+            var ramais = await _ramalRepository.GetListAsync();
+            var usuarios = await _userRepository.GetListAsync();
+
+            var resultado = ramais
+                .Select(r => new RamalRelatorioDto
+                {
+                    Nome = r.Nome,
+                    Numero = r.Numero,
+                    Departamento = r.Departamento,
+                    DataCriacao = r.CreationTime,
+                    CriadoPor = usuarios.FirstOrDefault(u => u.Id == r.CreatorId)?.UserName ?? "Desconhecido"
+                })
+                .ToList();
+
+            return resultado;
+        }
+    
     }
 }

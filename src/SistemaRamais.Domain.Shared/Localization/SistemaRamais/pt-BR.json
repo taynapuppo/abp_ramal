@@ -37,6 +37,12 @@
     "Unspecified": "Sistema",
     "SeeAllUsers": "Ver todos os usuários",
     "TakePhoto": "Tirar fotos",
-    "ChoosePhoto": "Escolher Foto"
+    "ChoosePhoto": "Escolher Foto",
+    "Menu:Ramais": "Ramais",
+    "Menu:SistemaRamais": "Sistema Ramais",
+    "Menu:Relatorios": "Relatórios",
+    "Menu:Graficos": "Gráficos",
+    "Relatórios": "Relatórios",
+    "Graficos": "Graficos"
   }
 }
