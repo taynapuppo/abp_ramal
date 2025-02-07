@@ -13,14 +13,14 @@ namespace SistemaRamais.Ramais
 {
     public abstract class RamalBase : FullAuditedAggregateRoot<Guid>
     {
-        public string Nome { get; set; }
-        public string Numero { get; set; }
-        public string Departamento { get; set; }
+        public string? Nome { get; set; }
+        public string? Numero { get; set; }
+        public string? Departamento { get; set; }
     
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
-        public string NormalizedName { get; set; }
-        public string NormalizedEmail { get; set; }
+        public string? NormalizedName { get; set; }
+        public string? NormalizedEmail { get; set; }
 
         protected RamalBase()
         {

@@ -30,5 +30,6 @@ namespace SistemaRamais.Ramais
         Task<int> GetTotalRamaisAsync();           
         Task<int> GetTotalDepartamentosAsync();    
         Task<int> GetTotalUsuariosAtivosAsync();
+
     }
 }

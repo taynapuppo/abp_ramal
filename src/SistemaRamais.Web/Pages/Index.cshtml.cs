@@ -18,15 +18,5 @@ namespace SistemaRamais.Web.Pages
             _ramaisAppService = ramaisAppService;
         }
 
-        public virtual async Task<IActionResult> OnGetAsync()
-        {
-            // Chama os métodos do serviço para obter as estatísticas
-            TotalRamais = await _ramaisAppService.GetTotalRamaisAsync();
-            TotalDepartamentos = await _ramaisAppService.GetTotalDepartamentosAsync();
-            TotalUsuariosAtivos = await _ramaisAppService.GetTotalUsuariosAtivosAsync();
-
-            // Retorna a página com as estatísticas preenchidas
-            return Page();
-        }
     }
 }

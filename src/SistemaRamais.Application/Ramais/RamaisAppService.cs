@@ -53,9 +53,8 @@ namespace SistemaRamais.Ramais
             _userRepository = userRepository;
 
         }
-
-        
-         public virtual async Task<PagedResultDto<RamalDto>> GetListAsync(GetRamaisInput input)
+            
+        public virtual async Task<PagedResultDto<RamalDto>> GetListAsync(GetRamaisInput input)
         {
             var totalCount = await _ramalRepository.GetCountAsync(_lookupNormalizer.NormalizeName(input.FilterText), _lookupNormalizer.NormalizeName(input.Nome), input.Numero, input.Departamento, _lookupNormalizer.NormalizeEmail(input.Email));
             var items = await _ramalRepository.GetListAsync(_lookupNormalizer.NormalizeName(input.FilterText), _lookupNormalizer.NormalizeName(input.Nome), input.Numero, input.Departamento, _lookupNormalizer.NormalizeEmail(input.Email), input.Sorting, input.MaxResultCount, input.SkipCount);
@@ -66,6 +65,8 @@ namespace SistemaRamais.Ramais
                 Items = ObjectMapper.Map<List<Ramal>, List<RamalDto>>(items)
             };
         }
+
+        
         public virtual async Task<RamalDto> GetAsync(Guid id)
         {
             return ObjectMapper.Map<Ramal, RamalDto>(await _ramalRepository.GetAsync(id));
@@ -103,7 +104,7 @@ namespace SistemaRamais.Ramais
             return ObjectMapper.Map<Ramal, RamalDto>(ramal);
         }
 
-        [AllowAnonymous]
+
         public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(RamalExcelDownloadDto input)
         {
             var downloadToken = await _downloadTokenCache.GetAsync(input.DownloadToken);
@@ -145,7 +146,7 @@ namespace SistemaRamais.Ramais
             };
         }
 
-
+       
         public virtual async Task<IActionResult> GetEstatisticas()
         {
             // Obter as estatísticas diretamente
@@ -162,10 +163,9 @@ namespace SistemaRamais.Ramais
             });
         }
 
-
-        public virtual async Task<int> GetTotalRamaisAsync()
+       
+        public async Task<int> GetTotalRamaisAsync()
         {
-            // Contagem de ramais
             return await _ramalRepository.CountAsync();
         }
 
@@ -176,16 +176,16 @@ namespace SistemaRamais.Ramais
 
             // Contagem de departamentos distintos
             var departamentos = ramais
-                .Select(r => r.Departamento) // Obter os departamentos
-                .Distinct() // Filtrar departamentos únicos
-                .Count(); // Contagem local
+                .Select(r => r.Departamento)
+                .Distinct() 
+                .Count(); 
 
             return departamentos;
         }
 
-        public virtual async Task<int> GetTotalUsuariosAtivosAsync()
+        public async Task<int> GetTotalUsuariosAtivosAsync()
         {
-            // Obter a lista de ramais do repositório
+            
             var ramais = await _ramalRepository.GetListAsync();
 
             
@@ -214,6 +214,8 @@ namespace SistemaRamais.Ramais
 
             return resultado;
         }
+
+        
     
     }
 }

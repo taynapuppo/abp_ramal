@@ -19,13 +19,14 @@ $(function () {
 	var getFilter = function() {
         return {
             filterText: $("#FilterText").val(),
-            nome: $("#NomeFilter").val(),
             numero: $("#NumeroFilter").val(),
-            departamento: $("#DepartamentoFilter").val(),
-            email: $("#EmailFilter").val(),
+			departamento: $("#DepartamentoFilter").val(),
+			responsavel: $("#ResponsavelFilter").val(),
+			email: $("#EmailFilter").val(),
+			telefone: $("#TelefoneFilter").val()
         };
     };
-    
+  
     
     //<suite-custom-code-block-1>
     //</suite-custom-code-block-1>
@@ -100,6 +101,7 @@ $(function () {
         ajax: abp.libs.datatables.createAjax(ramalService.getList, getFilter),
         columnDefs: dataTableColumns
     }));
+
     
     
     dataTable.on("xhr", function () {
@@ -262,16 +264,15 @@ $(function () {
         createModal.open();
     });
 
-	$("#SearchForm").submit(function (e) {
+    
+    $("#SearchForm").submit(function (e) {
         e.preventDefault();
-
-
         dataTable.ajax.reloadEx();;
         selectOrUnselectAllCheckboxes(false);
         showOrHideContextMenu();
     });
-
-
+    
+    
     $("#ExportToExcelButton").click(function (e) {
         e.preventDefault();
 
@@ -316,12 +317,5 @@ $(function () {
     
     //<suite-custom-code-block-3>
     //</suite-custom-code-block-3>
-    
-    
-    
-    
-    
-    
-    
     
 });

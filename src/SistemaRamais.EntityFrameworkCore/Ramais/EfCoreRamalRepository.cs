@@ -10,6 +10,7 @@ using Volo.Abp.EntityFrameworkCore;
 using SistemaRamais.EntityFrameworkCore;
 using FuzzySharp;
 
+
 namespace SistemaRamais.Ramais
 {
     public abstract class EfCoreRamalRepositoryBase : EfCoreRepository<SistemaRamaisDbContext, Ramal, Guid>
@@ -48,36 +49,9 @@ namespace SistemaRamais.Ramais
             int skipCount = 0,
             CancellationToken cancellationToken = default)
         {
-            // Aplica os filtros iniciais
-            var query = ApplyFilter((await GetQueryableAsync()), filterText, nome, numero, departamento, email);
-
-            // Ordena os resultados, caso o sorting seja especificado
+           var query = ApplyFilter((await GetQueryableAsync()), filterText, nome, numero, departamento, email);
             query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? RamalConsts.GetDefaultSorting(false) : sorting);
-
-            // Limita os resultados antes de carregar em memória
-            var limitedQuery = query.Take(500); // Limita para 500 resultados, ajuste conforme necessário
-
-            // Carrega os resultados limitados em memória
-            var ramaisList = await limitedQuery.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
-
-            // Verifica se nome não está nulo ou vazio
-            if (!string.IsNullOrWhiteSpace(nome))
-            {
-                // Log para verificar o nome que está sendo passado
-                Console.WriteLine($"Aplicando busca fuzzy para o nome: {nome}");
-
-                // Aplica o fuzzy search apenas nos resultados limitados
-                ramaisList = ramaisList
-                    .Where(r =>
-                    {
-                        var ratio = Fuzz.WeightedRatio(r.NormalizedName, nome);
-                        Console.WriteLine($"Comparando '{r.NormalizedName}' com '{nome}' - Razão fuzzy: {ratio}");
-                        return ratio > 50;
-                    })
-                    .ToList();
-            }
-
-            return ramaisList;
+            return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
 
         public virtual async Task<long> GetCountAsync(
@@ -87,11 +61,13 @@ namespace SistemaRamais.Ramais
             string? departamento = null,
             string? email = null,
             CancellationToken cancellationToken = default)
+
         {
             var query = ApplyFilter((await GetDbSetAsync()), filterText, nome, numero, departamento, email);
             return await query.LongCountAsync(GetCancellationToken(cancellationToken));
         }
 
+        
         protected virtual IQueryable<Ramal> ApplyFilter(
             IQueryable<Ramal> query,
             string? filterText = null,
@@ -100,22 +76,12 @@ namespace SistemaRamais.Ramais
             string? departamento = null,
             string? email = null)
         {
-
-            if (!string.IsNullOrWhiteSpace(nome))
-            {
-                var nomeNormalized = nome.ToLower();
-                query = query.Where(r => EF.Functions.ToTsVector("portuguese", r.NormalizedName)
-                                        .Matches(EF.Functions.PlainToTsQuery("portuguese", nomeNormalized)));
-            }
-
-            query = query
+            return query
                 .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.NormalizedName!.Contains(filterText!) || e.Numero!.Contains(filterText!) || e.Departamento!.Contains(filterText!) || e.NormalizedEmail!.Contains(filterText!))
                 .WhereIf(!string.IsNullOrWhiteSpace(nome), e => e.NormalizedName.Contains(nome))
                 .WhereIf(!string.IsNullOrWhiteSpace(numero), e => e.Numero.Contains(numero))
                 .WhereIf(!string.IsNullOrWhiteSpace(departamento), e => e.Departamento.Contains(departamento))
                 .WhereIf(!string.IsNullOrWhiteSpace(email), e => e.NormalizedEmail.Contains(email));
-
-            return query;
         }
     }
 }

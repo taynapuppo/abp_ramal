@@ -35,5 +35,6 @@ namespace SistemaRamais.Ramais
             string? departamento = null,
             string? email = null,
             CancellationToken cancellationToken = default);
+
     }
 }

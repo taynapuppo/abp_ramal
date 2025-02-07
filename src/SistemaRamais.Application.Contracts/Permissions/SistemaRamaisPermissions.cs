@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace SistemaRamais.Permissions;
 
 public static class SistemaRamaisPermissions
