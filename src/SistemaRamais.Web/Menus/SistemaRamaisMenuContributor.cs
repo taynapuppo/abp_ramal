@@ -13,6 +13,9 @@ using Volo.Abp.LanguageManagement.Navigation;
 using Volo.Abp.TextTemplateManagement.Web.Navigation;
 using Volo.Abp.OpenIddict.Pro.Web.Menus;
 using Volo.Saas.Host.Navigation;
+using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.Users;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaRamais.Web.Menus;
 
@@ -24,22 +27,41 @@ public class SistemaRamaisMenuContributor : IMenuContributor
         {
             await ConfigureMainMenuAsync(context);
         }
+
     }
 
     private static Task ConfigureMainMenuAsync(MenuConfigurationContext context)
+
     {
         var l = context.GetLocalizer<SistemaRamaisResource>();
 
-        //Home
+        if (context.ServiceProvider.GetRequiredService<ICurrentUser>().IsInRole("UsersDefault"))
+        {
+            context.Menu.Items.Clear(); 
+            context.Menu.AddItem(
+                new ApplicationMenuItem(
+                    "RamaisSearch",
+                    l["Menu:Ramais"],
+                    url: "/Ramais",
+                    icon: "fa fa-phone",
+                    order: 1
+                )
+            );
+            return Task.CompletedTask;
+        }
+
+
+        // Remove o item Home para todos os outros usuários
         context.Menu.AddItem(
             new ApplicationMenuItem(
-                SistemaRamaisMenus.Home,
-                l["Menu:Home"],
-                "~/",
-                icon: "fa fa-home",
-                order: 1
-            )
+                SistemaRamaisMenus.Ramais,
+                l["Menu:Ramais"],
+                url: "/Ramais",
+                icon: "fa fa-phone",
+                order: 1,
+                requiredPermissionName: SistemaRamaisPermissions.Ramais.Default)
         );
+    
 
         //HostDashboard
         context.Menu.AddItem(

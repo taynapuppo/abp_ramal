@@ -32,41 +32,41 @@ $(function () {
     //</suite-custom-code-block-1>
     
     var dataTableColumns = [
-            {
-                rowAction: {
-                    items:
-                        [
-                            {
-                                text: l("Edit"),
-                                visible: abp.auth.isGranted('SistemaRamais.Ramais.Edit'),
-                                action: function (data) {
-                                    editModal.open({
-                                     id: data.record.id
-                                     });
-                                }
-                            },
-                            {
-                                text: l("Delete"),
-                                visible: abp.auth.isGranted('SistemaRamais.Ramais.Delete'),
-                                confirmMessage: function () {
-                                    return l("DeleteConfirmationMessage");
-                                },
-                                action: function (data) {
-                                    ramalService.delete(data.record.id)
-                                        .then(function () {
-                                            abp.notify.success(l("SuccessfullyDeleted"));
-                                            dataTable.ajax.reloadEx();;
-                                        });
-                                }
+        { data: "nome" },
+        { data: "numero" },
+        { data: "departamento" },
+        { data: "email" },
+        {
+            rowAction: {
+                items:
+                    [
+                        {
+                            text: l("Edit"),
+                            visible: abp.auth.isGranted('SistemaRamais.Ramais.Edit'),
+                            action: function (data) {
+                                editModal.open({
+                                    id: data.record.id
+                                    });
                             }
-                        ]
-                },
-                width: "1rem"
+                        },
+                        {
+                            text: l("Delete"),
+                            visible: abp.auth.isGranted('SistemaRamais.Ramais.Delete'),
+                            confirmMessage: function () {
+                                return l("DeleteConfirmationMessage");
+                            },
+                            action: function (data) {
+                                ramalService.delete(data.record.id)
+                                    .then(function () {
+                                        abp.notify.success(l("SuccessfullyDeleted"));
+                                        dataTable.ajax.reloadEx();;
+                                    });
+                            }
+                        }
+                    ]
             },
-            { data: "nome" },
-			{ data: "numero" },
-			{ data: "departamento" },
-			{ data: "email" },
+            width: "1rem"
+        },
 		      
     ];
     

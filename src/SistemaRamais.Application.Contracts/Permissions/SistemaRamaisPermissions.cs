@@ -17,6 +17,7 @@ public static class SistemaRamaisPermissions
     public static class Ramais
     {
         public const string Default = GroupName + ".Ramais";
+        public const string View = Default + ".View";
         public const string Edit = Default + ".Edit";
         public const string Create = Default + ".Create";
         public const string Delete = Default + ".Delete";

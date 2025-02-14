@@ -105,12 +105,16 @@
             <thead>
 				<tr>
 				    <th id="BulkDeleteCheckboxTheader"><input type="checkbox" id="select_all" class="form-check-input" /></th>
-				    
-					<th>@L["Actions"]</th>
 					<th>@L["Nome"]</th>
 					<th>@L["Numero"]</th>
 					<th>@L["Departamento"]</th>
 					<th>@L["Email"]</th>
+
+                    @if (await Authorization.IsGrantedAsync(SistemaRamaisPermissions.Ramais.Edit) || 
+                        await Authorization.IsGrantedAsync(SistemaRamaisPermissions.Ramais.Delete))
+                    {
+                        <th>@L["Actions"]</th>
+                    }
 
 @*//<suite-custom-code-block-6>*@
 @*//</suite-custom-code-block-6>*@

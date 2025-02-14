@@ -18,6 +18,7 @@ public class SistemaRamaisPermissionDefinitionProvider : PermissionDefinitionPro
         //myGroup.AddPermission(SistemaRamaisPermissions.MyPermission1, L("Permission:MyPermission1"));
 
         var ramalPermission = myGroup.AddPermission(SistemaRamaisPermissions.Ramais.Default, L("Permission:Ramais"));
+        ramalPermission.AddChild(SistemaRamaisPermissions.Ramais.View, L("Permission:View"));
         ramalPermission.AddChild(SistemaRamaisPermissions.Ramais.Create, L("Permission:Create"));
         ramalPermission.AddChild(SistemaRamaisPermissions.Ramais.Edit, L("Permission:Edit"));
         ramalPermission.AddChild(SistemaRamaisPermissions.Ramais.Delete, L("Permission:Delete"));
