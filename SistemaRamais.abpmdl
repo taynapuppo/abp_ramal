@@ -1,0 +1,121 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXTheme": {
+      "version": "4.0.5",
+      "isInstalled": true
+    },
+    "Volo.Abp.TextTemplateManagement": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Abp.LanguageManagement": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict.Pro": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Abp.Gdpr": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Abp.AuditLogging.Pro": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Saas": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity.Pro": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account.Pro": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.0.4",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.0.4",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "SistemaRamais.Application": {
+      "path": "src/SistemaRamais.Application/SistemaRamais.Application.abppkg",
+      "folder": "src"
+    },
+    "SistemaRamais.Application.Tests": {
+      "path": "test/SistemaRamais.Application.Tests/SistemaRamais.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "SistemaRamais.Domain.Shared": {
+      "path": "src/SistemaRamais.Domain.Shared/SistemaRamais.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "SistemaRamais.Application.Contracts": {
+      "path": "src/SistemaRamais.Application.Contracts/SistemaRamais.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "SistemaRamais.HttpApi": {
+      "path": "src/SistemaRamais.HttpApi/SistemaRamais.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "SistemaRamais.HttpApi.Client": {
+      "path": "src/SistemaRamais.HttpApi.Client/SistemaRamais.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "SistemaRamais.Web": {
+      "path": "src/SistemaRamais.Web/SistemaRamais.Web.abppkg",
+      "folder": "src"
+    },
+    "SistemaRamais.Web.Tests": {
+      "path": "test/SistemaRamais.Web.Tests/SistemaRamais.Web.Tests.abppkg",
+      "folder": "test"
+    },
+    "SistemaRamais.EntityFrameworkCore.Tests": {
+      "path": "test/SistemaRamais.EntityFrameworkCore.Tests/SistemaRamais.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "SistemaRamais.EntityFrameworkCore": {
+      "path": "src/SistemaRamais.EntityFrameworkCore/SistemaRamais.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "SistemaRamais.TestBase": {
+      "path": "test/SistemaRamais.TestBase/SistemaRamais.TestBase.abppkg",
+      "folder": "test"
+    },
+    "SistemaRamais.Domain.Tests": {
+      "path": "test/SistemaRamais.Domain.Tests/SistemaRamais.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "SistemaRamais.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/SistemaRamais.HttpApi.Client.ConsoleTestApp/SistemaRamais.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "SistemaRamais.DbMigrator": {
+      "path": "src/SistemaRamais.DbMigrator/SistemaRamais.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "SistemaRamais.Domain": {
+      "path": "src/SistemaRamais.Domain/SistemaRamais.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}

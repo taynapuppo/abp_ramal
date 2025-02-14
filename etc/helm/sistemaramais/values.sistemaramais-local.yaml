@@ -1,0 +1,11 @@
+global:
+  hosts:
+    dbmigrator: "[RELEASE_NAME]-dbmigrator"
+    web: "[RELEASE_NAME]-web"
+  connectionStrings:
+    default: "Host=[RELEASE_NAME]-postgresql;Port=5432;Database=SistemaRamais;User ID=postgres;Password=myPassword;"
+  dotnetEnvironment: "Staging"
+  disablePII: "false"
+  stringEncryptionDefaultPassPhrase: "uEXXWSYVkxrUWO7N"
+  abpStudioClient:
+    isLinkEnabled: "true"

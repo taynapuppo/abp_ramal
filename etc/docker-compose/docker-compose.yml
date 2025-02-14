@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  sistemaramais-web:
+    image: mycompanyname/sistemaramais-web:latest
+    container_name: sistemaramais-web
+    hostname: sistemaramais-web
+    build:
+      context: ../../
+      dockerfile: src/SistemaRamais.Web/Dockerfile.local
+    environment:
+      - ASPNETCORE_URLS=https://+:443;http://+:80;
+      - Kestrel__Certificates__Default__Path=/root/certificate/localhost.pfx
+      - Kestrel__Certificates__Default__Password=8c139e60-6f31-4409-9569-ea186c4ad673
+      - App__SelfUrl=https://localhost:44353
+      - AuthServer__RequireHttpsMetadata=false
+      - AuthServer__Authority=http://sistemaramais-web
+      - App__HealthCheckUrl=http://sistemaramais-web/health-status      
+      - ConnectionStrings__Default=User ID=postgres;Password=myPassw0rd;Host=postgres;Port=5432;Database=SistemaRamais;Pooling=false;
+    ports:
+      - "44353:443"
+    restart: on-failure
+    volumes:
+      - ./certs:/root/certificate
+    networks:
+      - abp-network
+
+  
+
+  
+  db-migrator:
+    image: mycompanyname/sistemaramais-db-migrator:latest
+    container_name: db-migrator
+    build:
+      context: ../../
+      dockerfile: src/SistemaRamais.DbMigrator/Dockerfile.local
+    environment:
+      - OpenIddict__Applications__SistemaRamais_Web__RootUrl=https://localhost:44353
+      - OpenIddict__Applications__SistemaRamais_Swagger__RootUrl=https://localhost:44338      
+      - ConnectionStrings__Default=User ID=postgres;Password=myPassw0rd;Host=postgres;Port=5432;Database=SistemaRamais;Pooling=false;
+      - Redis__Configuration=redis
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - abp-network
+  
+  postgres:
+    container_name: postgres-db
+    image: postgres:14.1
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "myPassw0rd"
+    volumes:
+      - postgres_data:/var/opt/postgres
+    networks: 
+      - abp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5    
+
+volumes:
+  postgres_data:
+    name: sistemaramais_postgres_data
+networks:
+  abp-network:
+    name: sistemaramais-network
+    driver: bridge

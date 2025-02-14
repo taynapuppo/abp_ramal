@@ -1,0 +1,34 @@
+﻿@page
+@model SistemaRamais.Web.Pages.IndexModel
+@using SistemaRamais.Web.Menus
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using Microsoft.AspNetCore.Mvc.Localization
+@using SistemaRamais.Localization
+@using Volo.Abp.Users
+@inject IPageLayout PageLayout
+@inject IHtmlLocalizer<SistemaRamaisResource> L
+@inject ICurrentUser CurrentUser
+@{
+    ViewBag.PageTitle = L["Home"];
+    PageLayout.Content.MenuItemName = SistemaRamaisMenus.Home;
+}
+
+@section styles {
+    <abp-style src="/Pages/Index.css" />
+}
+
+@section scripts {
+    <script src="~/js/index.js"></script> 
+}
+
+<div class="row">
+    <div class="col-md-12 mt-4">
+        <div class="card p-4 shadow">
+            <h4 class="mb-3">Atalhos</h4>
+            <div class="d-flex gap-3">
+                <a href="/Ramais" class="btn btn-success"><i class="fa fa-plus"></i> Adicionar Ramal</a>
+                <a href="/Ramais" class="btn btn-info"><i class="fa fa-list"></i> Listar Ramais</a>
+            </div>
+        </div>
+    </div>
+</div>
