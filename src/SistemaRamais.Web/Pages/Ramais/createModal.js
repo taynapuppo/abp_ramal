@@ -6,12 +6,12 @@ var abp = abp || {};
 abp.modals.ramalCreate = function () {
     var initModal = function (publicApi, args) {
         var l = abp.localization.getResource("SistemaRamais");
+
         
         
         
         
-        
-        
+
     };
     
     //<suite-custom-code-block-2>

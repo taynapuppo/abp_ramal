@@ -21,6 +21,7 @@ using Volo.Saas.Tenants;
 using Volo.Abp.Gdpr;
 
 
+
 namespace SistemaRamais.EntityFrameworkCore;
 
 [ReplaceDbContext(typeof(IIdentityProDbContext))]
@@ -75,8 +76,6 @@ public class SistemaRamaisDbContext :
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
-        /* Include modules to your migration db context */
 
         builder.ConfigurePermissionManagement();
         builder.ConfigureSettingManagement();

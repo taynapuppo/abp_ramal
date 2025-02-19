@@ -6,6 +6,7 @@ var abp = abp || {};
 abp.modals.ramalEdit = function () {
     var initModal = function (publicApi, args) {
         var l = abp.localization.getResource("SistemaRamais");
+
         
         
         
@@ -13,8 +14,7 @@ abp.modals.ramalEdit = function () {
         
         
         
-        
-        
+
     };
     
     //<suite-custom-code-block-2>

@@ -50,19 +50,6 @@ public class SistemaRamaisMenuContributor : IMenuContributor
             return Task.CompletedTask;
         }
 
-
-        // Remove o item Home para todos os outros usuários
-        context.Menu.AddItem(
-            new ApplicationMenuItem(
-                SistemaRamaisMenus.Ramais,
-                l["Menu:Ramais"],
-                url: "/Ramais",
-                icon: "fa fa-phone",
-                order: 1,
-                requiredPermissionName: SistemaRamaisPermissions.Ramais.Default)
-        );
-    
-
         //HostDashboard
         context.Menu.AddItem(
             new ApplicationMenuItem(

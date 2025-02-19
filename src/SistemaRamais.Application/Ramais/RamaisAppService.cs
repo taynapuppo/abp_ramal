@@ -65,7 +65,7 @@ namespace SistemaRamais.Ramais
             };
         }
 
-        
+
         public virtual async Task<RamalDto> GetAsync(Guid id)
         {
             return ObjectMapper.Map<Ramal, RamalDto>(await _ramalRepository.GetAsync(id));
@@ -145,6 +145,6 @@ namespace SistemaRamais.Ramais
             {
                 Token = token
             };
-        } 
+        }
     }
 }

@@ -97,7 +97,7 @@ $(function () {
         scrollX: true,
         autoWidth: true,
         scrollCollapse: true,
-        order: [[2, "asc"]],
+        order: [[0, "asc"]],
         ajax: abp.libs.datatables.createAjax(ramalService.getList, getFilter),
         columnDefs: dataTableColumns
     }));
